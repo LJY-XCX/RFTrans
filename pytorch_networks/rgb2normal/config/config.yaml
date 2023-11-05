@@ -1,0 +1,123 @@
+# train.py Config - Training
+train:
+  # For datasets, please pass atleast 1 value. If no datasets exist, pass "" as path for images.
+  # Synthetic datasets with ground truth labels
+  datasetsTrain:
+    - images: '/ssd1/jiyu/data/unity/train/RGB'
+      flows: '/ssd1/jiyu/data/unity/train/flow'
+      labels: '/ssd1/jiyu/data/unity/train/normal'
+      masks: '/ssd1/jiyu/data/unity/train/mask'
+
+
+  # Synthetic datasets with ground truth labels - 10% split of train
+  datasetsVal:
+    - images: '/ssd1/jiyu/data/unity/valid/RGB'
+      flows: '/ssd1/jiyu/data/unity/valid/flow'
+      labels: '/ssd1/jiyu/data/unity/valid/normal'
+      masks: '/ssd1/jiyu/data/unity/valid/mask'
+
+
+  # Real Images (no ground truth labels)
+  datasetsTestReal:
+
+  # Synthetic datasets with ground truth labels - Used as test set
+  datasetsTestSynthetic:
+
+
+  # Training/Validation Params
+  rgb2flow:
+    model: "drn" # Possible values: ["drn", unet", "deeplab_xception", "deeplab_resnet", "refinenet"]
+    numClasses: 2
+    numInputChannels: 3
+    pathWeightsFile: "/home/jiyu/ClearGrasp/pytorch_networks/rgb2normal/logs-deeplab/exp-002/checkpoints/r2f-checkpoint-epoch-0150.pth"
+
+  flow2normal:
+    model: "simple_unet"
+    numClasses: 3
+    numInputChannels: 3
+    pathWeightsFile: "/home/jiyu/ClearGrasp/pytorch_networks/rgb2normal/logs-deeplab/exp-002/checkpoints/f2n-checkpoint-epoch-0150.pth"
+
+  batchSize: 8
+  batchSizeMatterport: 0
+  batchSizeScannet: 0
+  validationBatchSize: 16
+  testBatchSize: 16
+  numEpochs: 501
+  imgHeight: 512
+  imgWidth: 512
+  numWorkers: 16 # Num of workers used in the dataloader
+  logsDir: "logs-deeplab" # Directory where logs of each exp will be saved.
+  lossFunc: "cosine" # Possible values: ['cosine', 'radians']
+  percentageDataForTraining: 1.0 # The percentage of images in dataset to be used for training.
+  percentageDataForMatterportTraining: 0.5 # The percentage of images in dataset to be used for training.
+  percentageDataForScannetTraining: 0.35
+  percentageDataForValidation: 0.5
+  percentageDataForMatterportVal: 0.5
+  percentageDataForScannettVal: 0.5
+
+  # Deeplab specific
+  outputStride: 8 # Possible values: [8, 16]. Output stride for deeplabv3 model. Smaller values give finer details in output mask.
+  epochSize: 1 # After these many epochs, change learning rate
+
+  continueTraining: False # If true, continue training from a checkpoint
+  initOptimizerFromCheckpoint: False # Re-Initialize optimizer's state from checkpoint. NOTE: when this is enabled, value of learningRate will be overridden with value from checkpoint.
+  loadEpochNumberFromCheckpoint: False # If true, the epoch/iter numbering will start from the checkpoint's last epoch num.
+
+  saveImageInterval: 1 # Log output images to tensorboard every saveImageInterval epochs
+  saveImageIntervalIter: 1000 # Every N iterations, log output images to tensorboard
+  testInterval: 1 # Run on test set every nTestInterval epochs. Keep at 0 to skip tests.
+  saveModelInterval: 1 # Save the model checkpoints every N epochs
+
+  # Optimizer Params
+  optimizer: "Adam" # Possible Values: ["SGD", "Adam"]
+  optimAdam:
+    learningRate: 5e-5
+    weightDecay: 0.0001 # Other values: 0.0001
+  optimSgd:
+    learningRate: 1e-6
+    momentum: 0.9
+    weight_decay: 5e-4
+  lrScheduler: "StepLR" # Possible Values: ['', 'StepLR', 'ReduceLROnPlateau']
+  lrSchedulerStep:
+    step_size: 1000
+    gamma: 0.1
+  lrSchedulerPlateau:
+    factor: 0.8
+    patience: 25
+    verbose: True
+
+# eval.py Config - Validation/Testing Inference
+eval:
+  # Synthetic datasets with ground truth labels
+  # Used as validation set
+  datasetsSynthetic:
+    - images: '/ssd1/jiyu/data/unity/valid/RGB'
+      flows: ''
+      labels: '/ssd1/jiyu/data/unity/valid/normal'
+      masks: '/ssd1/jiyu/data/unity/valid/mask'
+
+  # Datasets of real images, no labels available
+  # Used as Test set
+  datasetsReal:
+
+
+  # Params
+  rgb2flow:
+    model: "drn" # Possible values: ["drn", unet", "deeplab_xception", "deeplab_resnet", "refinenet"]
+    numClasses: 2
+    numInputChannels: 3 # Num of channels in input image. RGB = 3 channels, Grayscale = 1 channel.
+    pathWeightsFile: "/home/jiyu/ClearGrasp/pytorch_networks/refractive_flow/logs-deeplab/exp-033/checkpoints/checkpoint-epoch-0500.pth"
+  flow2normal:
+    model: "simple_unet"
+    numClasses: 3
+    numInputChannels: 3 # Num of channels in input image. RGB = 3 channels, Grayscale = 1 channel.
+    pathWeightsFile: "/home/jiyu/ClearGrasp/pytorch_networks/flow2normal/logs-deeplab/exp-012/checkpoints/checkpoint-epoch-0080.pth"
+
+  numClasses: 30
+  batchSize: 16
+  imgHeight: 512
+  imgWidth: 512
+  os: 8
+  numWorkers: 4 # Num of workers used in the dataloader
+  resultsDir: "data/results/"
+

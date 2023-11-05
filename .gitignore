@@ -1,0 +1,14 @@
+
+
+**/data/
+**/logs-deeplab/
+**/__pycache__/
+**/mmseg_models/
+**/SwinDRNet/
+**/data-cg/
+**/cleargrasp-checkpoints/
+**/results/
+**/masks/
+**/occulusion_boundaries/
+**/surface_normals/
+**/plot/
